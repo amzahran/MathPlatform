@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Ahmed Omar</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      height: 100vh;
+      padding: 20px 0;
+      box-sizing: border-box;
+    }
+    .sidebar .profile {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .sidebar .profile h2 {
+      margin: 0;
+      color: #f1c40f;
+    }
+    .sidebar .profile p {
+      font-size: 14px;
+      color: #bdc3c7;
+    }
+    .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .sidebar a:hover {
+      background-color: #34495e;
+    }
+
+    .main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 15px 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-item {
+      position: relative;
+    }
+    .nav-left a, .nav-right a {
+      text-decoration: none;
+      color: #1a252f;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 10px 12px;
+      transition: color 0.3s ease;
+    }
+    .nav-left a:hover, .nav-right a:hover {
+      color: #d4ac0d;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      min-width: 160px;
+      z-index: 1000;
+      border-radius: 4px;
+    }
+    .dropdown-content a {
+      padding: 10px 15px;
+      display: block;
+      color: #1a252f;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .dropdown-content a:hover {
+      background-color: #f8f9fa;
+    }
+    .nav-item:hover .dropdown-content {
+      display: block;
+    }
+    .highlight-btn {
+      background-color: #f1c40f;
+      color: #2c3e50;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .highlight-btn:hover {
+      background-color: #d4ac0d;
+    }
+
+    .content {
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="profile">
+      <h2>Ahmed Omar</h2>
+      <p>Math Professor</p>
+    </div>
+    <a href="createtests.html?type=act-i&action=create">Create Tests</a>
+    <a href="upload_files.html">Manage Files</a>
+  </div>
+
+  <div class="main">
+    <div class="navbar">
+      <div class="nav-left">
+        <a href="index_admin.html">Home</a>
+        <div class="nav-item">
+          <a href="#">Materials ▼</a>
+          <div class="dropdown-content">
+            <a href="#">Books</a>
+            <a href="#">Tests</a>
+            <a href="#">Videos</a>
+            <a href="#">Pictures</a>
+            <a href="#">Other Resources</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#">Computerized Tests ▼</a>
+          <div class="dropdown-content">
+            <a href="act_i_test_list.html">ACT I</a>
+            <a href="act_ii_test_list.html">ACT II</a>
+            <a href="est_i_test_list.html">EST I</a>
+            <a href="est_ii_test_list.html">EST II</a>
+            <a href="dsat_test_list.html">Digital SAT</a>
+            <a href="univ_courses_test_list.html">University Courses</a>
+          </div>
+        </div>
+        <a href="book_shop.html">Book Shop</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="calculator.html">Score Calculator</a>
+      </div>
+      <div class="nav-right">
+        <a href="login.html" class="highlight-btn">Login</a>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Welcome Admin</h1>
+      <p>This is the main content area.</p>
+    </div>
+  </div>
+
+</body>
+</html>

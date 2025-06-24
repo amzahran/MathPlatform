@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Resource</title>
+  <style>
+    body {
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .upload-box {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #34495e;
+    }
+    select, input[type="file"], input[type="text"], button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .file-input {
+      margin-bottom: 15px;
+    }
+    .link-input {
+      display: none;
+      margin-bottom: 15px;
+    }
+    .visibility-option {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="upload-box">
+  <h2>Upload Resource</h2>
+  <form id="uploadForm" enctype="multipart/form-data" method="post" action="upload_resource_sqlsrv.php">
+    <label for="fileType">Resource Type</label>
+    <select id="fileType" name="fileType" onchange="toggleInput()" required>
+      <option value="" disabled selected>Select type</option>
+      <option value="pdf">Book</option>
+      <option value="pdf">Test</option>
+      <option value="video">Video</option>
+      <option value="image">Picture</option>
+      <option value="link">Other (Web Link)</option>
+    </select>
+
+    <div class="file-input">
+      <label for="fileUpload">Choose File</label>
+      <input type="file" id="fileUpload" name="fileUpload">
+    </div>
+
+    <div class="link-input">
+      <label for="linkInput">URL</label>
+      <input type="url" id="linkInput" name="linkInput" placeholder="https://example.com">
+    </div>
+
+    <label for="category">Category</label>
+    <select id="category" name="category" required>
+      <option value="" disabled selected>Select category</option>
+      <option value="ACT-I">ACT I</option>
+      <option value="ACT-II">ACT II</option>
+      <option value="EST-I">EST I</option>
+      <option value="EST-II">EST II</option>
+      <option value="SAT-I">Digital SAT</option>
+      <option value="Univ-Courses">University Courses</option>
+    </select>
+
+    <div class="visibility-option">
+      <label>
+        <input type="checkbox" id="isPublic" name="isPublic" checked>
+        Make this resource public
+      </label>
+    </div>
+
+    <button type="submit">Upload Resource</button>
+  </form>
+</div>
+
+<script>
+  function toggleInput() {
+    const fileType = document.getElementById("fileType").value;
+    const fileInputDiv = document.querySelector(".file-input");
+    const linkInputDiv = document.querySelector(".link-input");
+
+    if (fileType === "link") {
+      fileInputDiv.style.display = "none";
+      linkInputDiv.style.display = "block";
+      document.getElementById("fileUpload").removeAttribute("required");
+      document.getElementById("linkInput").setAttribute("required", "");
+    } else {
+      fileInputDiv.style.display = "block";
+      linkInputDiv.style.display = "none";
+      document.getElementById("fileUpload").setAttribute("required", "");
+      document.getElementById("linkInput").removeAttribute("required");
+    }
+  }
+
+  document.getElementById("uploadForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const form = document.getElementById("uploadForm");
+    const formData = new FormData(form);
+
+    fetch("upload_resource_sqlsrv.php", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.text())
+    .then(response => {
+      alert(response);
+      const category = document.getElementById("category").value;
+      window.location.href = `viewer_admin_tables.html?type=${category}`;
+    })
+    .catch(error => {
+      console.error("Upload error:", error);
+      alert("❌ Upload failed.");
+    });
+  });
+</script>
+</body>
+</html>

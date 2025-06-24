@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Score Calculator</title>
+  <style>
+    body {
+       body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 720px;
+            background: #ffffff;
+            padding: 50px 40px;
+            margin: auto;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 38px;
+            color: #0d47a1;
+        }
+
+        label {
+            display: block;
+            margin-top: 25px;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 5px rgba(21, 101, 192, 0.4);
+            outline: none;
+        }
+
+        button {
+            margin-top: 35px;
+            width: 100%;
+            background: linear-gradient(to right, #1565c0, #0d47a1);
+            color: white;
+            padding: 18px;
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #0d47a1, #002171);
+        }
+
+        #result {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 28px;
+            color: #2e7d32;
+            font-weight: bold;
+            background-color: #e8f5e9;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px dashed #a5d6a7;
+        }
+    </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Score & GPA Calculator</h2>
+
+    <label for="category">Select Score Category:</label>
+    <select id="category">
+      <option value="dsat_est2">DSAT / EST II</option>
+      <option value="dsat_act2">DSAT / ACT II</option>
+      <option value="est1_est2">EST I / EST II</option>
+      <option value="est1_act2">EST I / ACT II</option>
+      <option value="act1_act2">ACT I / ACT II</option>
+      <option value="act1_est2">ACT I / EST II</option>
+    </select>
+
+    <label for="type">Institution Type:</label>
+    <select id="type">
+      <option value="gov">Government Universities</option>
+      <option value="ahly">Non-Profit Private Universities</option>
+      <option value="khas">Private Universities</option>
+    </select>
+
+    <label for="score1">Score 1 (out of 1600):</label>
+    <input type="number" id="score1" placeholder="Enter first score (e.g., DSAT or EST I or ACT I)" />
+
+    <label for="score2">Score 2 (out of 1600):</label>
+    <input type="number" id="score2" placeholder="Enter second score (e.g., EST II or ACT II)" />
+
+    <label for="gpa">GPA (out of 4.0):</label>
+    <input type="number" step="0.01" id="gpa" placeholder="Enter GPA" />
+
+    <button onclick="calculateScore()">Calculate</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculateScore() {
+      const score1 = parseFloat(document.getElementById("score1").value);
+      const score2 = parseFloat(document.getElementById("score2").value);
+      const gpa = parseFloat(document.getElementById("gpa").value);
+      const type = document.getElementById("type").value;
+
+      if (isNaN(score1) || isNaN(score2) || isNaN(gpa)) {
+        document.getElementById("result").innerText = "Please fill all fields correctly.";
+        return;
+      }
+
+      let weight1 = 0, weight2 = 0, weightGpa = 0;
+
+      // Score 1 weights
+      if (type === "gov") {
+        if (score1 >= 1090) {
+          weight1 = (score1 / 1600) * 69;
+        } else {
+          weight1 = (score1 / 1600) * 60;
+        }
+      } else {
+        if (score1 >= 1090) {
+          weight1 = (score1 / 1600) * 75;
+        } else {
+          weight1 = (score1 / 1600) * 60;
+        }
+      }
+
+      // Score 2 weight always 15%
+      weight2 = (score2 / 1600) * 15;
+
+      // GPA out of 40 directly (not percentage based)
+      weightGpa = gpa;
+
+      const total = (weight1 + weight2 + weightGpa).toFixed(4);
+
+      document.getElementById("result").innerHTML = `<strong>Total Weighted Score:</strong> ${total}`;
+    }
+  </script>
+</body>
+</html>

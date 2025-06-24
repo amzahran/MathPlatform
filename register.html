@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register New Student</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .register-box {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #2ecc71;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .error { color: red; margin: 10px 0; }
+    .success { color: green; margin: 10px 0; }
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <h2>Register New Student</h2>
+    <form id="registerForm">
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <input type="text" id="grade" placeholder="Grade" required />
+      <input type="text" id="mobile" placeholder="Mobile" pattern="[0-9]+" title="Numbers only" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" minlength="6" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+      <button type="submit" id="submitBtn">Register</button>
+      <div class="loader" id="loader"></div>
+      <div id="message"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById("submitBtn");
+      const loader = document.getElementById("loader");
+      const message = document.getElementById("message");
+      
+      // Show loader
+      submitBtn.style.display = "none";
+      loader.style.display = "block";
+      message.textContent = "";
+      
+      const data = {
+        fullName: document.getElementById("fullName").value.trim(),
+        grade: document.getElementById("grade").value.trim(),
+        mobile: document.getElementById("mobile").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value,
+        confirmPassword: document.getElementById("confirmPassword").value
+      };
+
+      try {
+        const response = await fetch("register.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        message.textContent = result.message;
+        message.className = result.status === "success" ? "success" : "error";
+        
+        if (result.status === "success") {
+          document.getElementById("registerForm").reset();
+        }
+      } catch (error) {
+        message.textContent = "An error occurred. Please try again.";
+        message.className = "error";
+        console.error("Error:", error);
+      } finally {
+        // Hide loader
+        submitBtn.style.display = "block";
+        loader.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

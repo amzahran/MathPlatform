@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Student Platform - Login</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        .login-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 0.5rem;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .message {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .error {
+            background-color: #fdecea;
+            color: var(--error-color);
+            display: block;
+            animation: shake 0.5s;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+            display: block;
+        }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin: -10px 0 15px 0;
+        }
+        
+        .forgot-password a {
+            color: #666;
+            font-size: 0.9em;
+            text-decoration: none;
+        }
+        
+        .security-tips {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .redirect-message {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        #countdown {
+            font-weight: bold;
+            color: var(--success-color);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Student Login</h1>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Enter your username" 
+                    required
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Enter your password" 
+                    required
+                    autocomplete="current-password"
+                    minlength="6"
+                >
+            </div>
+            
+            <div class="forgot-password">
+                <a href="forgot_password.html">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="btn" id="loginBtn">Login</button>
+            <div class="loader" id="loader"></div>
+            
+            <div id="message" class="message"></div>
+        </form>
+        
+        <div class="security-tips">
+            <p>🔒 Always log out after using a shared computer</p>
+        </div>
+        
+        <div class="footer">
+            Don't have an account? <a href="register.html">Register here</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            const loader = document.getElementById('loader');
+            const message = document.getElementById('message');
+            
+            // حفظ اسم المستخدم عند تحديث الصفحة
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                document.getElementById('username').value = savedUsername;
+            }
+            
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // عرض مؤشر التحميل وإخفاء الزر
+                loginBtn.style.display = 'none';
+                loader.style.display = 'block';
+                message.style.display = 'none';
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await fetch('login.php', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // حفظ اسم المستخدم
+                        localStorage.setItem('username', username);
+                        
+                        // عرض رسالة النجاح مع العد التنازلي
+                        message.innerHTML = `
+                            <span style="color:green">✓ Login successful!</span>
+                            <div class="redirect-message">
+                                Redirecting to test list in <span id="countdown">3</span> seconds...
+                            </div>
+                        `;
+                        message.className = 'message success';
+                        message.style.display = 'block';
+                        
+                        // العد التنازلي للتوجيه
+                        let seconds = 3;
+                        const countdown = setInterval(() => {
+                            seconds--;
+                            document.getElementById('countdown').textContent = seconds;
+                            if (seconds <= 0) {
+                                clearInterval(countdown);
+                                window.location.href = result.redirect;
+                            }
+                        }, 1000);
+                    } else {
+                        // عرض رسالة الخطأ
+                        message.textContent = result.message || 'Invalid username or password';
+                        message.className = 'message error';
+                        message.style.display = 'block';
+                        
+                        // إعادة عرض زر الدخول
+                        loginBtn.style.display = 'block';
+                        loader.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    message.textContent = 'Network error. Please try again.';
+                    message.className = 'message error';
+                    message.style.display = 'block';
+                    
+                    // إعادة عرض زر الدخول
+                    loginBtn.style.display = 'block';
+                    loader.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<div class="payment-options">
+    <div class="payment-method" id="qnbMethod">
+        <h3><img src="qnb-logo.png" alt="QNB"> الدفع عبر QNB</h3>
+        <button onclick="initiateQNBPayment()">الدفع الآن</button>
+    </div>
+
+    <div class="payment-method" id="weMethod">
+        <h3><img src="we-logo.png" alt="We"> الدفع عبر We</h3>
+        <div id="wePaymentForm" style="display:none;">
+            <input type="text" id="wePhone" placeholder="رقم We المحمول">
+            <input type="password" id="wePin" placeholder="رمز We السري">
+            <button onclick="processWePayment()">تأكيد الدفع</button>
+        </div>
+        <button onclick="showWeForm()">الدفع الآن</button>
+    </div>
+</div>
+
+<script>
+// معالجة دفع QNB
+async function initiateQNBPayment() {
+    try {
+        const response = await fetch('qnb_payment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: selectedTest.price,
+                test_id: selectedTest.id
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            window.location.href = `payment_success.html?txid=${result.transaction_id}`;
+        } else {
+            showError(result.message);
+        }
+    } catch (error) {
+        showError('فشل عملية الدفع');
+    }
+}
+
+// معالجة دفع We
+function showWeForm() {
+    document.getElementById('wePaymentForm').style.display = 'block';
+}
+
+async function processWePayment() {
+    const weData = {
+        we_token: generateWeToken(), // يتم توليده من تطبيق We
+        amount: selectedTest.price,
+        test_id: selectedTest.id
+    };
+    
+    try {
+        const response = await fetch('we_payment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(weData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            window.location.href = `payment_success.html?txid=${result.transaction_id}`;
+        } else {
+            showError(result.message);
+        }
+    } catch (error) {
+        showError('فشل عملية الدفع عبر We');
+    }
+}
+</script>

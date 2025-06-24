@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Files</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f9f9f9; }
+    .container { max-width: 960px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    input, select, button { margin: 10px 5px; padding: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #007BFF; color: white; }
+    .btn-download { background: green; color: white; padding: 5px 10px; border: none; }
+    .btn-delete { background: red; color: white; padding: 5px 10px; border: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>File Management</h2>
+    <input type="text" id="fileName" placeholder="File Name">
+    <input type="text" id="fileUrl" placeholder="File URL/Link">
+    <select id="fileType">
+      <option value="">Select Type</option>
+      <option value="PDF">PDF</option>
+      <option value="Video">Video</option>
+      <option value="Link">Link</option>
+    </select>
+    <select id="fileCategory">
+      <option value="">Select Category</option>
+      <option value="ACT-I">ACT-I</option>
+      <option value="ACT-II">ACT-II</option>
+      <option value="EST-I">EST-I</option>
+      <option value="EST-II">EST-II</option>
+    </select>
+    <button onclick="addFile()">Add File</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Type</th>
+          <th>Category</th>
+          <th>Upload Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fileTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const storageKey = "adminFiles";
+    const tableBody = document.getElementById("fileTableBody");
+
+    function loadFiles() {
+      const files = JSON.parse(localStorage.getItem(storageKey)) || [];
+      tableBody.innerHTML = "";
+      files.forEach((file, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${file.name}</td>
+          <td>${file.type}</td>
+          <td>${file.category}</td>
+          <td>${file.date}</td>
+          <td>
+            <a class="btn-download" href="${file.url}" target="_blank">Download</a>
+            <button class="btn-delete" onclick="deleteFile(${index})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function addFile() {
+      const name = document.getElementById("fileName").value;
+      const url = document.getElementById("fileUrl").value;
+      const type = document.getElementById("fileType").value;
+      const category = document.getElementById("fileCategory").value;
+      const date = new Date().toLocaleDateString();
+
+      if (!name || !url || !type || !category) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const files = JSON.parse(localStorage.getItem(storageKey)) || [];
+      files.push({ name, url, type, category, date });
+      localStorage.setItem(storageKey, JSON.stringify(files));
+      loadFiles();
+
+      document.getElementById("fileName").value = "";
+      document.getElementById("fileUrl").value = "";
+      document.getElementById("fileType").value = "";
+      document.getElementById("fileCategory").value = "";
+    }
+
+    function deleteFile(index) {
+      const files = JSON.parse(localStorage.getItem(storageKey)) || [];
+      files.splice(index, 1);
+      localStorage.setItem(storageKey, JSON.stringify(files));
+      loadFiles();
+    }
+
+    loadFiles();
+  </script>
+</body>
+</html>

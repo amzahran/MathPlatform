@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .balance-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+        .transaction-history {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .recharge-btn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .recharge-btn:hover {
+            background-color: #0069d9;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="balance-container">
+        <h2>Your Balance: <span id="currentBalance">$0.00</span></h2>
+        
+        <button class="recharge-btn" onclick="rechargeBalance()">Recharge Balance (+$10)</button>
+        
+        <div class="transaction-history">
+            <h3>Transaction History</h3>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="loading">Loading transactions...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function handleApiResponse(response) {
+            if (!response.ok) {
+                const errorText = await response.text();
+                try {
+                    return JSON.parse(errorText);
+                } catch {
+                    throw new Error(errorText || `HTTP error! status: ${response.status}`);
+                }
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error("Invalid response format");
+            }
+            
+            return response.json();
+        }
+
+        async function loadBalanceData() {
+            try {
+                const [balanceResponse, transactionsResponse] = await Promise.all([
+                    fetch('get_balance.php'),
+                    fetch('get_transactions.php')
+                ]);
+
+                const [balanceData, transactionsData] = await Promise.all([
+                    handleApiResponse(balanceResponse),
+                    handleApiResponse(transactionsResponse)
+                ]);
+
+                if (balanceData.status === 'success') {
+                    document.getElementById('currentBalance').textContent = `$${balanceData.balance}`;
+                } else {
+                    throw new Error(balanceData.message || 'Failed to load balance');
+                }
+
+                const tbody = document.querySelector('#transactionsTable tbody');
+                if (transactionsData.status === 'success' && transactionsData.data?.length > 0) {
+                    tbody.innerHTML = transactionsData.data.map(t => `
+                        <tr>
+                            <td>${new Date(t.date).toLocaleString()}</td>
+                            <td>${t.description || 'N/A'}</td>
+                            <td class="${t.amount >= 0 ? 'positive' : 'negative'}">
+                                $${Math.abs(t.amount).toFixed(2)}
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3">No transactions found</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.querySelector('#transactionsTable tbody').innerHTML = `
+                    <tr>
+                        <td colspan="3" style="color: #dc3545;">
+                            Error loading data: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function rechargeBalance() {
+            try {
+                const response = await fetch('recharge_balance.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await handleApiResponse(response);
+                
+                if (result.status === 'success') {
+                    alert('Balance recharged successfully!');
+                    await loadBalanceData();
+                } else {
+                    throw new Error(result.message || 'Recharge failed');
+                }
+            } catch (error) {
+                console.error('Recharge error:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadBalanceData);
+    </script>
+</body>
+</html>

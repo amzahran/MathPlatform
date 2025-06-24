@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Preview</title>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --accent-color: #7209b7;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4cc9f0;
+      --warning-color: #f8961e;
+      --danger-color: #f94144;
+      --question-border-color: hsl(125, 76%, 56%);
+      --border-radius: 8px;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background-color: #f0f2f5;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .test-content {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    /* Break Screen Styles */
+    .break-screen {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 20px;
+    }
+
+    .break-content {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    .break-timer-container {
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: var(--border-radius);
+    }
+
+    .break-timer {
+      font-size: 48px;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin: 10px 0;
+    }
+
+    .continue-btn {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 20px;
+    }
+
+    .continue-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .question-container {
+      margin-bottom: 30px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: var(--dark-color);
+      line-height: 1.5;
+      padding: 15px;
+      border: 2px solid var(--question-border-color);
+      border-radius: var(--border-radius);
+      background-color: #f8faff;
+      box-shadow: 0 2px 8px rgba(58, 134, 255, 0.1);
+    }
+
+    .question-image {
+      max-width: 100%;
+      height: auto;
+      margin: 20px auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-height: 300px;
+      object-fit: contain;
+    }
+
+    .options-container {
+      margin-top: 25px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      background-color: white;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .option:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
+    }
+
+    .option.selected {
+      border-color: var(--primary-color);
+      background-color: #f0f4ff;
+    }
+
+    .option input[type="radio"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #adb5bd;
+      border-radius: 50%;
+      margin-right: 15px;
+      transition: var(--transition);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .option input[type="radio"]:checked {
+      border-color: var(--primary-color);
+      background-color: var(--primary-color);
+    }
+
+    .option input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+    }
+
+    .option-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: bold;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .option-image {
+      max-width: 150px;
+      max-height: 100px;
+      margin-left: 15px;
+      border-radius: 6px;
+      object-fit: contain;
+      border: 1px solid #eee;
+    }
+
+    .gridin-input {
+      width: 100%;
+      max-width: 200px;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 2px solid #b70808;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      margin: 0 auto;
+    }
+
+    .gridin-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .correct-answer {
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e6f7e6;
+      border-radius: var(--border-radius);
+      color: #2e8b57;
+      font-weight: 500;
+      display: none;
+    }
+
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    button:disabled {
+      background-color: #e9ecef !important;
+      color: #adb5bd !important;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    #prevBtn {
+      background-color: #f8f9fa;
+      color: var(--dark-color);
+      border: 1px solid #dee2e6;
+    }
+
+    #prevBtn.active {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+
+    #nextBtn {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    #submitBtn {
+      background-color: var(--success-color);
+      color: white;
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    #sectionSubmitBtn {
+      background-color: var(--warning-color);
+      color: white;
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    #result {
+      margin-top: 30px;
+      padding: 25px;
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      text-align: center;
+      display: none;
+    }
+
+    .result-title {
+      color: var(--dark-color);
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .result-score {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 10px 0;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question-counter {
+      text-align: center;
+      color: #6c757d;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .section-timer {
+      background-color: var(--dark-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: var(--border-radius);
+      font-weight: bold;
+      margin-top: 10px;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .section-timer.warning {
+      color: #f94144 !important;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* إخفاء العناصر غير المرغوبة في شاشة الفاصل */
+    .break-screen header,
+    .break-screen .progress-container,
+    .break-screen .question-counter,
+    .break-screen .section-timer,
+    .break-screen #sectionSubmitBtn {
+      display: none !important;
+    }
+
+    /* تحسينات صفحة النتائج */
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .report-table th, 
+    .report-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .report-table th {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .report-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .correct {
+      color: var(--success-color);
+      font-weight: bold;
+    }
+
+    .wrong {
+      color: var(--danger-color);
+      font-weight: bold;
+    }
+
+    .answer-display {
+      font-weight: bold;
+      display: block;
+      margin-top: 5px;
+    }
+
+    /* MathJax styles */
+    .MathJax {
+      font-size: 1.1em !important;
+    }
+
+    .math-equation {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .test-content {
+        padding: 20px;
+      }
+      
+      .question-text {
+        font-size: 16px;
+      }
+      
+      .option {
+        padding: 12px 15px;
+      }
+      
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+      
+      .break-timer {
+        font-size: 36px;
+      }
+      
+      .break-content {
+        padding: 20px;
+      }
+    }
+  </style>
+  <!-- MathJax Configuration -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        packages: {'[+]': ['ams', 'color', 'boldsymbol']}
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      },
+      loader: {
+        load: ['[tex]/ams', '[tex]/color', '[tex]/boldsymbol']
+      }
+    };
+  </script>
+  <!-- MathJax Library -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h2>Exam Preview</h2>
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div class="question-counter" id="questionCounter"></div>
+      <div class="section-timer" id="sectionTimer">Time: --:--</div>
+    </header>
+    
+    <div id="breakScreen" class="break-screen">
+      <div class="break-content">
+        <h2>Section Break</h2>
+        <p>You have completed this section. Take a short break before continuing.</p>
+        <div class="break-timer-container">
+          <div class="break-timer" id="breakTimer">--</div>
+        </div>
+        <button id="continueBtn" class="continue-btn">Continue to Next Section</button>
+      </div>
+    </div>
+    
+    <div class="test-content" id="testContent">
+      <div id="sectionTitle" class="section-title"></div>
+      <div id="questionContainer"></div>
+      
+      <div class="navigation-buttons">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+      </div>
+    </div>
+    
+    <button id="sectionSubmitBtn">Submit Section</button>
+    <button id="submitBtn">Submit Exam</button>
+    
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // Exam data structure
+    let sections = [];
+    let currentSectionIndex = 0;
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let sectionTimeLeft = 0;
+    let breakTimeLeft = 0;
+    let sectionTimer;
+    let breakTimer;
+
+    // DOM elements
+    const testContent = document.getElementById('testContent');
+    const breakScreen = document.getElementById('breakScreen');
+    const sectionTimerDisplay = document.getElementById('sectionTimer');
+    const breakTimerDisplay = document.getElementById('breakTimer');
+    const sectionSubmitBtn = document.getElementById('sectionSubmitBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultDiv = document.getElementById('result');
+    const continueBtn = document.getElementById('continueBtn');
+
+    // Initialize the exam
+    function initExam() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const testId = urlParams.get('testid') || 1;
+
+      fetch(`get_full_Test_Pro.php?testID=${testId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'error') {
+            document.getElementById('questionContainer').innerHTML = `
+              <div class="question-container" style="text-align: center; color: #dc3545;">
+                ${data.message || 'Error loading test'}
+              </div>
+            `;
+            return;
+          }
+          
+          sections = data.sections || [];
+          userAnswers = sections.map(section => new Array(section.Questions.length).fill(null));
+          
+          // Set timers (convert minutes to seconds)
+          sectionTimeLeft = parseInt(sections[currentSectionIndex]?.Duration || 35) * 60;
+          breakTimeLeft = parseInt(data.test?.BreakDuration || 1) * 60;
+          
+          updateTimerDisplay();
+          startSectionTimer();
+          updateProgressBar();
+          showQuestion();
+        })
+        .catch(error => {
+          document.getElementById('questionContainer').innerHTML = `
+            <div class="question-container" style="text-align: center; color: #dc3545;">
+              Failed to load test. Please try again later.
+            </div>
+          `;
+          console.error('Error:', error);
+        });
+    }
+
+    // Update timer display (MM:SS format)
+    function updateTimerDisplay() {
+      const minutes = Math.floor(sectionTimeLeft / 60);
+      const seconds = sectionTimeLeft % 60;
+      
+      sectionTimerDisplay.textContent = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      
+      // Add warning style when time is running out
+      if (sectionTimeLeft <= 60) {
+        sectionTimerDisplay.classList.add('warning');
+      } else {
+        sectionTimerDisplay.classList.remove('warning');
+      }
+    }
+
+    // Start section countdown timer
+    function startSectionTimer() {
+      clearInterval(sectionTimer);
+      updateTimerDisplay();
+      
+      sectionTimer = setInterval(() => {
+        sectionTimeLeft--;
+        updateTimerDisplay();
+        
+        if (sectionTimeLeft <= 0) {
+          clearInterval(sectionTimer);
+          submitSection();
+        }
+      }, 1000);
+    }
+
+    // Start break countdown timer
+    function startBreakTimer() {
+      clearInterval(breakTimer);
+      
+      const minutes = Math.floor(breakTimeLeft / 60);
+      const seconds = breakTimeLeft % 60;
+      breakTimerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      
+      breakTimer = setInterval(() => {
+        breakTimeLeft--;
+        
+        const mins = Math.floor(breakTimeLeft / 60);
+        const secs = breakTimeLeft % 60;
+        breakTimerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        
+        if (breakTimeLeft <= 0) {
+          clearInterval(breakTimer);
+          startNextSection();
+        }
+      }, 1000);
+    }
+
+    // Submit current section
+    function submitSection() {
+      clearInterval(sectionTimer);
+      testContent.style.display = 'none';
+      document.querySelector('header').style.display = 'none';
+      breakScreen.style.display = 'block';
+      
+      // إضافة زر الاستمرار يدويًا إذا انتهى الوقت
+      continueBtn.onclick = startNextSection;
+      startBreakTimer();
+    }
+
+    // Start next section
+    function startNextSection() {
+      breakScreen.style.display = 'none';
+      testContent.style.display = 'block';
+      document.querySelector('header').style.display = 'block';
+      
+      currentSectionIndex++;
+      currentQuestionIndex = 0;
+      sectionTimeLeft = parseInt(sections[currentSectionIndex]?.Duration || 35) * 60;
+      updateTimerDisplay();
+      startSectionTimer();
+      showQuestion();
+    }
+
+    // Show current question with MathJax support
+    function showQuestion() {
+      const section = sections[currentSectionIndex];
+      const question = section.Questions[currentQuestionIndex];
+      
+      document.getElementById('sectionTitle').innerText = `Section ${currentSectionIndex + 1}: ${section.SectionTitle}`;
+      document.getElementById('questionCounter').innerText = `Question ${currentQuestionIndex + 1} of ${section.Questions.length}`;
+      
+      const container = document.getElementById('questionContainer');
+      container.innerHTML = '';
+
+      const qDiv = document.createElement('div');
+      qDiv.className = 'question-container';
+
+      if (question.QuestionImage) {
+        const img = document.createElement('img');
+        img.src = question.QuestionImage;
+        img.alt = 'Question Image';
+        img.className = 'question-image';
+        qDiv.appendChild(img);
+      }
+
+      const qText = document.createElement('div');
+      qText.className = 'question-text';
+      
+      // Create a span for question text that will be processed by MathJax
+      const questionTextSpan = document.createElement('span');
+      questionTextSpan.className = 'tex2jax_process';
+      questionTextSpan.innerHTML = `${currentQuestionIndex + 1}. ${question.QuestionText}`;
+      qText.appendChild(questionTextSpan);
+      qDiv.appendChild(qText);
+
+      if (question.QuestionType === 'MCQ') {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'options-container';
+        
+        question.AnswerOptions.forEach((opt, idx) => {
+          const optDiv = document.createElement('label');
+          optDiv.className = `option ${userAnswers[currentSectionIndex][currentQuestionIndex] === idx ? 'selected' : ''}`;
+
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'answer';
+          radio.checked = userAnswers[currentSectionIndex][currentQuestionIndex] === idx;
+          radio.onclick = () => {
+            userAnswers[currentSectionIndex][currentQuestionIndex] = idx;
+            updateProgressBar();
+          };
+
+          const label = document.createElement('div');
+          label.className = 'option-label';
+          
+          // Create spans for option text that will be processed by MathJax
+          const optionLetterSpan = document.createElement('span');
+          optionLetterSpan.className = 'option-letter';
+          optionLetterSpan.textContent = String.fromCharCode(65 + idx);
+          
+          const optionTextSpan = document.createElement('span');
+          optionTextSpan.className = 'tex2jax_process';
+          optionTextSpan.innerHTML = opt.OptionText || '';
+          
+          label.appendChild(optionLetterSpan);
+          label.appendChild(optionTextSpan);
+
+          optDiv.appendChild(radio);
+          optDiv.appendChild(label);
+
+          if (opt.OptionImage) {
+            const optImg = document.createElement('img');
+            optImg.src = opt.OptionImage;
+            optImg.alt = 'Option Image';
+            optImg.className = 'option-image';
+            optDiv.appendChild(optImg);
+          }
+
+          optionsContainer.appendChild(optDiv);
+        });
+
+        qDiv.appendChild(optionsContainer);
+            } else if (question.QuestionType.toLowerCase() === 'gridin') {
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'gridin-container';
+
+        const input = document.createElement('input');
+        input.className = 'gridin-input';
+        input.placeholder = 'Enter your answer';
+        input.value = userAnswers[currentSectionIndex][currentQuestionIndex] || '';
+        input.oninput = (e) => {
+          userAnswers[currentSectionIndex][currentQuestionIndex] = e.target.value;
+          updateProgressBar();
+        };
+
+        gridContainer.appendChild(input);
+
+        const correct = question.AnswerOptions[0]?.OptionText;
+        if (correct) {
+          const correctDiv = document.createElement('div');
+          correctDiv.className = 'correct-answer';
+          correctDiv.innerHTML = `Correct Answer: <span class="tex2jax_process">${correct}</span>`;
+          gridContainer.appendChild(correctDiv);
+        }
+
+        qDiv.appendChild(gridContainer);
+      }
+
+      container.appendChild(qDiv);
+      updateNavigationButtons();
+      
+      // Tell MathJax to typeset the new content
+      if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise([container]).catch(err => console.log('MathJax typeset error:', err));
+      }
+    }
+
+    // Update progress bar
+    function updateProgressBar() {
+      let totalQuestions = 0;
+      let answeredQuestions = 0;
+      
+      sections.forEach((section, sIdx) => {
+        section.Questions.forEach((_, qIdx) => {
+          totalQuestions++;
+          if (userAnswers[sIdx][qIdx] !== null) {
+            answeredQuestions++;
+          }
+        });
+      });
+      
+      const progressPercentage = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
+      document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+    }
+
+    // Update navigation buttons
+    function updateNavigationButtons() {
+      const currentSection = sections[currentSectionIndex];
+      const isLastQuestion = currentQuestionIndex === currentSection.Questions.length - 1;
+      const isLastSection = currentSectionIndex === sections.length - 1;
+      
+      if (currentQuestionIndex > 0 || currentSectionIndex > 0) {
+        prevBtn.classList.add('active');
+      } else {
+        prevBtn.classList.remove('active');
+      }
+      
+      nextBtn.disabled = isLastQuestion;
+      
+      sectionSubmitBtn.style.display = isLastQuestion && !isLastSection ? 'block' : 'none';
+      document.getElementById('submitBtn').style.display = isLastQuestion && isLastSection ? 'block' : 'none';
+    }
+
+    // Navigation handlers
+    nextBtn.onclick = () => {
+      const section = sections[currentSectionIndex];
+      if (currentQuestionIndex < section.Questions.length - 1) {
+        currentQuestionIndex++;
+      } else if (currentSectionIndex < sections.length - 1) {
+        submitSection();
+        return;
+      } else {
+        submitExam();
+        return;
+      }
+      showQuestion();
+    };
+
+    prevBtn.onclick = () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+      } else if (currentSectionIndex > 0) {
+        currentSectionIndex--;
+        currentQuestionIndex = sections[currentSectionIndex].Questions.length - 1;
+      }
+      showQuestion();
+    };
+
+    sectionSubmitBtn.onclick = submitSection;
+
+    // Submit entire exam
+    function submitExam() {
+          document.querySelector("header").style.display = "none";
+    let score = 0;
+      let total = 0;
+      
+      const report = document.createElement('div');
+      report.innerHTML = `
+        <h3 class="result-title">Exam Results</h3>
+        <div class="result-score">Score: ${score} / ${total}</div>
+      `;
+      
+      sections.forEach((section, sIdx) => {
+        const sectionReport = document.createElement('div');
+        sectionReport.innerHTML = `
+          <h4>Section ${sIdx + 1}: ${section.SectionTitle}</h4>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Question #</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        `;
+        
+        const tbody = sectionReport.querySelector('tbody');
+        
+        section.Questions.forEach((q, qIdx) => {
+          total++;
+          const userAns = userAnswers[sIdx][qIdx];
+          let correctAnswer, isCorrect;
+          let userAnswerDisplay = '';
+          let correctAnswerDisplay = '';
+          
+          if (q.QuestionType === 'MCQ') {
+            const correctIndex = q.AnswerOptions.findIndex(opt => opt.IsCorrect == 1);
+            correctAnswer = String.fromCharCode(65 + correctIndex);
+            correctAnswerDisplay = `<span class="answer-display">${correctAnswer}</span>`;
+            
+            if (userAns !== null) {
+              userAnswerDisplay = `<span class="answer-display">${String.fromCharCode(65 + userAns)}</span>`;
+              isCorrect = userAns === correctIndex;
+            } else {
+              userAnswerDisplay = '<span class="answer-display">-</span>';
+              isCorrect = false;
+            }
+          } else {
+            correctAnswer = q.AnswerOptions[0]?.OptionText;
+            correctAnswerDisplay = `<span class="answer-display tex2jax_process">${correctAnswer || '-'}</span>`;
+            
+            if (userAns) {
+              userAnswerDisplay = `<span class="answer-display">${userAns}</span>`;
+              isCorrect = userAns.toString().trim() === correctAnswer?.trim();
+            } else {
+              userAnswerDisplay = '<span class="answer-display">-</span>';
+              isCorrect = false;
+            }
+          }
+          
+          if (isCorrect) score++;
+          
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${qIdx + 1}</td>
+            <td>${userAnswerDisplay}</td>
+            <td>${correctAnswerDisplay}</td>
+            <td class="${isCorrect ? 'correct' : 'wrong'}">
+              ${isCorrect ? '✓' : '✗'}
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        report.appendChild(sectionReport);
+      });
+      
+      const percentage = Math.round((score / total) * 100);
+      let message = '';
+      
+      if (percentage >= 90) message = 'Excellent!';
+      else if (percentage >= 75) message = 'Very Good!';
+      else if (percentage >= 60) message = 'Good!';
+      else if (percentage >= 50) message = 'Pass';
+      else message = 'You need more practice';
+      
+      const scoreDiv = report.querySelector('.result-score');
+      scoreDiv.textContent = `Score: ${score} / ${total} (${percentage}%)`;
+      
+      const messageP = document.createElement('p');
+      messageP.style.fontSize = '18px';
+      messageP.style.marginTop = '10px';
+      messageP.textContent = message;
+      report.appendChild(messageP);
+      
+      resultDiv.innerHTML = '';
+      resultDiv.appendChild(report);
+      resultDiv.style.display = 'block';
+      
+      resultDiv.scrollIntoView({ behavior: 'smooth' });
+      
+      testContent.style.display = 'none';
+      breakScreen.style.display = 'none';
+      document.getElementById('submitBtn').style.display = 'none';
+      sectionSubmitBtn.style.display = 'none';
+      
+      // Tell MathJax to typeset the results
+      if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise([resultDiv]).catch(err => console.log('MathJax typeset error:', err));
+      }
+    }
+
+    document.getElementById('submitBtn').onclick = submitExam;
+
+    // Initialize the exam when page loads
+    window.onload = initExam;
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const breakScreen = document.getElementById("breakScreen");
+  const submitSectionBtn = document.getElementById("sectionSubmitBtn");
+
+  const observer = new MutationObserver(() => {
+    if (breakScreen && breakScreen.style.display === "block") {
+      if (submitSectionBtn) submitSectionBtn.style.display = "none";
+    } else {
+      if (submitSectionBtn) submitSectionBtn.style.display = "inline-block";
+    }
+  });
+
+  if (breakScreen) {
+    observer.observe(breakScreen, { attributes: true, attributeFilter: ["style"] });
+  }
+});
+</script>
+
+</body>
+</html>

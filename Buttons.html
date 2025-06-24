@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Edit Test</title>
+  <style>
+    /* التنسيق الجديد للزرين فقط */
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      z-index: 100;
+    }
+    .action-btn {
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .add-question-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    .update-test-btn {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+    }
+    .action-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <!-- محتوى الصفحة الحالي -->
+  <div id="testContainer">
+    <!-- سيتم تعبئته بالبيانات -->
+  </div>
+
+  <!-- زرين التحكم -->
+  <div class="action-buttons">
+    <button class="action-btn add-question-btn" onclick="addQuestion()">Add Question</button>
+    <button class="action-btn update-test-btn" onclick="saveChanges()">Update Test</button>
+  </div>
+
+  <script>
+    // الدوال الأصلية بدون تغيير
+    function addQuestion() {
+      // تنبيه مؤقت
+      alert("Add Question function will be implemented here");
+    }
+
+    function saveChanges() {
+      // كود الحفظ الأصلي
+      alert("Update Test function will save changes");
+    }
+  </script>
+</body>
+</html>

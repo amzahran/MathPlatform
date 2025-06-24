@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Edit Test</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: white;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+    .section-container {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: #fff;
+    }
+    .section-header {
+      background: #f1f1f1;
+      padding: 8px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .option input[type="text"] {
+      flex: 2;
+    }
+    .option input[type="file"] {
+      flex: 2;
+    }
+    .btn {
+      padding: 8px 12px;
+      margin: 10px 5px 0 0;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: #e74c3c;
+    }
+    .btn-success {
+      background: #27ae60;
+    }
+    .question {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+    }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .preview-image {
+      max-width: 100px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .error-message {
+      color: red;
+      margin: 10px 0;
+    }
+    .success-message {
+      color: green;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<h2>Edit Test</h2>
+<label>Test Title:</label>
+<input id="testTitle" type="text"/><br/>
+<label>Test Type:</label>
+<select id="testType">
+<option>Free</option>
+<option>Paid</option>
+</select><br/>
+<label>Category:</label>
+<select id="category">
+<option>ACT I</option>
+<option>ACT II</option>
+<option>EST I</option>
+<option>EST II</option>
+<option>Digital SAT</option>
+<option>Univ Courses</option>
+</select>
+<label>Price:</label>
+<input id="price" step="0.01" type="number" value="0"/>
+<label>Break Duration (minutes):</label>
+<input id="breakDuration" step="1" type="number" value="5"/><br/>
+<div id="sectionsContainer"></div>
+<div class="error-message" id="errorMessage" style="display:none;"></div>
+<div class="success-message" id="successMessage" style="display:none;"></div>
+<button class="btn" onclick="addSection()">+ Add Section</button>
+<button class="btn-success" onclick="saveEditedTest()">💾 Save Test</button>
+</div>
+<script>
+const testID = new URLSearchParams(window.location.search).get('testID');
+
+// Load test data
+fetch(`Get_full_Test_Pro.php?testID=${testID}`)
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      document.getElementById('testTitle').value = data.test.TestTitle;
+      document.getElementById('testType').value = data.test.TestType;
+      document.getElementById('category').value = data.test.CategoryTest || 'ACT I';
+      document.getElementById('price').value = data.test.Price || 0;
+      document.getElementById('breakDuration').value = data.test.BreakDuration || 5;
+      
+      if (data.sections && Array.isArray(data.sections)) {
+        data.sections.forEach(sec => addSection(sec));
+      }
+    } else {
+      showError('Failed to load test data: ' + (data.message || ''));
+    }
+  })
+  .catch(err => {
+    showError('Error loading test: ' + err.message);
+  });
+
+function showError(message) {
+  const errorEl = document.getElementById('errorMessage');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+  document.getElementById('successMessage').style.display = 'none';
+}
+
+function showSuccess(message) {
+  const successEl = document.getElementById('successMessage');
+  successEl.textContent = message;
+  successEl.style.display = 'block';
+  document.getElementById('errorMessage').style.display = 'none';
+}
+
+function addSection(sectionData = null) {
+  const secIndex = document.querySelectorAll('.section-container').length + 1;
+  const container = document.getElementById("sectionsContainer");
+  const div = document.createElement("div");
+  div.className = "section-container";
+  div.innerHTML = `
+    <div class="section-header">Module ${secIndex}</div>
+    <label>Section Title:</label>
+    <input type="text" class="sectionTitle" value="${sectionData?.SectionTitle || 'Module ' + secIndex}">
+    <label>Duration (min):</label>
+    <input type="number" class="duration" value="${sectionData?.Duration || 35}">
+    <label>Number of Questions:</label>
+    <input type="number" class="numberOfQuestions" value="${sectionData?.Questions?.length || 1}">
+    <div class="questions"></div>
+    <button class="btn" onclick="addQuestion(this)">+ Add Question</button>
+  `;
+  container.appendChild(div);
+  const qWrap = div.querySelector('.questions');
+  if (sectionData && sectionData.Questions) {
+    sectionData.Questions.forEach(q => addQuestion(div.querySelector(".btn"), q));
+  } else {
+    addQuestion(div.querySelector(".btn"));
+  }
+}
+
+function addQuestion(btn, questionData = null) {
+  const q = document.createElement("div");
+  q.className = "question";
+  const questionTypeRaw = questionData?.QuestionType?.trim().toLowerCase().replace(/[^a-z\-]/g, '') || '';
+  const isGrid = questionTypeRaw.includes('grid');
+
+  const questionId = Date.now() + Math.random();
+  q.innerHTML = `
+    <label>Question Text:</label>
+    <textarea>${questionData?.QuestionText || ''}</textarea>
+    <label>Type:</label>
+    <select onchange="toggleOptionDisplay(this)">
+      <option value="MCQ" ${!isGrid ? 'selected' : ''}>MCQ</option>
+      <option value="Grid-In" ${isGrid ? 'selected' : ''}>Grid-In</option>
+    </select>
+    ${questionData?.QuestionImage ? `<img src="${questionData.QuestionImage}" class="preview-image">` : ''}
+    <label>Question Image:</label>
+    <input type="file"><br>
+    <div class="grid-answer" style="display:${isGrid ? 'block' : 'none'}">
+      <label>Correct Answer:</label>
+      <input type="text" value="${(questionData?.AnswerOptions?.find(opt => opt.IsCorrect == 1)?.OptionText) || ''}">
+    </div>
+    <div class="mcq-options" style="display:${isGrid ? 'none' : 'block'}">
+      ${['A','B','C','D'].map((l, i) => `
+        <div class="option">
+          <input type="text" value="${questionData?.AnswerOptions?.[i]?.OptionText || ''}" placeholder="Option ${l}">
+          ${questionData?.AnswerOptions?.[i]?.OptionImage ? `<img src="${questionData.AnswerOptions[i].OptionImage}" class="preview-image">` : ''}
+          <input type="file">
+          <label><input type="radio" name="correct${questionId}" ${questionData?.AnswerOptions?.[i]?.IsCorrect ? 'checked' : ''}> Correct</label>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-danger" onclick="this.parentElement.remove()">🗑 Remove Question</button>
+  `;
+  btn.previousElementSibling.appendChild(q);
+
+  const select = q.querySelector("select");
+  toggleOptionDisplay(select);
+}
+
+function toggleOptionDisplay(selectEl) {
+  const parent = selectEl.closest('.question');
+  const isGrid = selectEl.value.toLowerCase() === 'grid-in';
+  parent.querySelector('.grid-answer').style.display = isGrid ? 'block' : 'none';
+  parent.querySelector('.mcq-options').style.display = isGrid ? 'none' : 'block';
+}
+
+function saveEditedTest() {
+  // Validate required fields
+  if (!document.getElementById('testTitle').value.trim()) {
+    showError('Test title is required');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('testID', testID);
+  formData.append('TestTitle', document.getElementById('testTitle').value);
+  formData.append('TestType', document.getElementById('testType').value);
+  formData.append('Category', document.getElementById('category').value);
+  formData.append('Price', document.getElementById('price')?.value || '0');
+  formData.append('BreakDuration', document.getElementById('breakDuration')?.value || '5');
+
+  const sectionsData = [];
+  
+  document.querySelectorAll('.section-container').forEach((secEl, secIndex) => {
+    const section = {
+      SectionNumber: secIndex + 1,
+      SectionTitle: secEl.querySelector('.sectionTitle')?.value || '',
+      Duration: parseInt(secEl.querySelector('.duration')?.value || 0),
+      NumberOfQuestions: parseInt(secEl.querySelector('.numberOfQuestions')?.value || 0),
+      Questions: []
+    };
+
+    secEl.querySelectorAll('.question').forEach((qEl, qIndex) => {
+      const question = {
+        QuestionText: qEl.querySelector('textarea')?.value || '',
+        QuestionType: qEl.querySelector('select')?.value || '',
+        AnswerOptions: []
+      };
+
+      // Handle question image
+      const qFileInput = qEl.querySelector('input[type="file"]');
+      if (qFileInput.files.length > 0) {
+        formData.append(`questionImage_${secIndex}_${qIndex}`, qFileInput.files[0]);
+        question.QuestionImage = `questionImage_${secIndex}_${qIndex}`;
+      } else if (qEl.querySelector('img.preview-image')?.src) {
+        // Keep existing image if no new file is uploaded
+        question.QuestionImage = qEl.querySelector('img.preview-image').src;
+      }
+
+      if (question.QuestionType === 'Grid-In') {
+        const gridAnswer = qEl.querySelector('.grid-answer input')?.value || '';
+        question.AnswerOptions.push({
+          OptionText: gridAnswer,
+          IsCorrect: 1
+        });
+      } else {
+        qEl.querySelectorAll('.mcq-options .option').forEach((optEl, optIndex) => {
+          const optText = optEl.querySelector('input[type="text"]')?.value || '';
+          const isCorrect = optEl.querySelector('input[type="radio"]')?.checked;
+          
+          const optFileInput = optEl.querySelector('input[type="file"]');
+          if (optFileInput.files.length > 0) {
+            formData.append(`optionImage_${secIndex}_${qIndex}_${optIndex}`, optFileInput.files[0]);
+          } else if (optEl.querySelector('img.preview-image')?.src) {
+            // Keep existing image if no new file is uploaded
+            question.AnswerOptions[optIndex] = question.AnswerOptions[optIndex] || {};
+            question.AnswerOptions[optIndex].OptionImage = optEl.querySelector('img.preview-image').src;
+          }
+
+          question.AnswerOptions.push({
+            OptionText: optText,
+            OptionImage: optFileInput.files.length > 0 ? `optionImage_${secIndex}_${qIndex}_${optIndex}` : 
+                        (optEl.querySelector('img.preview-image')?.src || ''),
+            IsCorrect: isCorrect ? 1 : 0
+          });
+        });
+      }
+
+      section.Questions.push(question);
+    });
+
+    sectionsData.push(section);
+  });
+
+  formData.append('Sections', JSON.stringify(sectionsData));
+
+  // Show loading state
+  const saveBtn = document.querySelector('.btn-success');
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '⏳ Saving...';
+  saveBtn.disabled = true;
+
+  // Clear previous messages
+  document.getElementById('errorMessage').style.display = 'none';
+  document.getElementById('successMessage').style.display = 'none';
+
+  fetch('Save_edited_Test_Pro.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(async res => {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return { status: 'success', message: text };
+    }
+  })
+  .then(data => {
+    if (data.status === 'success') {
+      showSuccess(data.message || '✅ Test saved successfully!');
+    } else {
+      showError(data.message || '❌ Failed to save test');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    showError('❌ Error saving test: ' + err.message);
+  })
+  .finally(() => {
+    saveBtn.innerHTML = originalText;
+    saveBtn.disabled = false;
+  });
+}
+
+document.addEventListener('change', function (e) {
+  if (e.target.type === 'file') {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate image size and type
+      if (!file.type.match('image.*')) {
+        showError('Only image files are allowed');
+        e.target.value = '';
+        return;
+      }
+      
+      if (file.size > 2 * 1024 * 1024) {
+        showError('Image size should be less than 2MB');
+        e.target.value = '';
+        return;
+      }
+
+      let preview = e.target.parentElement.querySelector('img.preview-image');
+      if (!preview) {
+        preview = document.createElement('img');
+        preview.className = 'preview-image';
+        e.target.parentElement.insertBefore(preview, e.target);
+      }
+      preview.src = URL.createObjectURL(file);
+    }
+  }
+});
+</script>
+</body>
+</html>

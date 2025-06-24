@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Results</title>
+  <style>
+    .question-container { border: 1px solid #ccc; margin: 15px; padding: 10px; }
+    .correct { background-color: #d4edda; }
+    .incorrect { background-color: #f8d7da; }
+    .answer { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Math 0022 - Results</h2>
+  <div id="results-container"></div>
+
+  <script>
+    const globalQuestions = [
+      {
+        QuestionText: "$(x+y-2)(x+y+2)=$",
+        CorrectAnswer: "$(x+y-2)(x+y+2)=$",
+        UserAnswer: "$(x+y-2)(x+y+2)=$"
+      },
+      {
+        QuestionText: "$(x+y-2)(x+y+2)=$",
+        CorrectAnswer: "$(x+y-2)(x+y+2)=$",
+        UserAnswer: "$(x+y-2)(x+y+2)=$"
+      },
+      {
+        QuestionText: "$(x+y-2)(x+y+2)=$",
+        CorrectAnswer: "22222",
+        UserAnswer: "22222"
+      }
+    ];
+
+    function showResults() {
+      const container = document.getElementById("results-container");
+      let correctCount = 0;
+      let html = "";
+
+      globalQuestions.forEach((q, index) => {
+        const isCorrect = q.UserAnswer === q.CorrectAnswer;
+        if (isCorrect) correctCount++;
+        html += `
+          <div class="question-container ${isCorrect ? "correct" : "incorrect"}">
+            <p><strong>Question ${index + 1}:</strong> ${q.QuestionText}</p>
+            <p class="answer">Your answer: ${q.UserAnswer}</p>
+            <p class="answer">Correct answer: ${q.CorrectAnswer}</p>
+            <p>${isCorrect ? "✅ Correct" : "❌ Incorrect"}</p>
+          </div>
+        `;
+      });
+
+      container.innerHTML = `<h3>Test Results</h3><p>${correctCount} out of ${globalQuestions.length} correct<br>${Math.round((correctCount / globalQuestions.length) * 100)}%</p>` + html;
+    }
+
+    window.onload = showResults;
+  </script>
+</body>
+</html>
