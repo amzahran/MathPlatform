@@ -5,11 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel - Ahmed Omar</title>
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: Arial, sans-serif;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
       display: flex;
     }
+
+    /* الشريط الجانبي (بقي كما هو) */
     .sidebar {
       width: 220px;
       background-color: #2c3e50;
@@ -17,6 +25,7 @@
       height: 100vh;
       padding: 20px 0;
       box-sizing: border-box;
+      flex-shrink: 0;
     }
     .sidebar .profile {
       text-align: center;
@@ -41,76 +50,82 @@
       background-color: #34495e;
     }
 
+    /* الجزء الرئيسي */
     .main {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
 
+    /* شريط التنقل العلوي (تم تعديله ليكون مثل صفحة المستخدم) */
     .navbar {
+      background-color: #ffffff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #fff;
-      padding: 15px 30px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
     }
+
     .nav-left, .nav-right {
       display: flex;
       align-items: center;
       gap: 20px;
     }
-    .nav-item {
-      position: relative;
-    }
+
     .nav-left a, .nav-right a {
       text-decoration: none;
-      color: #1a252f;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 10px 12px;
+      color: #333;
+      font-weight: 500;
       transition: color 0.3s ease;
     }
+
     .nav-left a:hover, .nav-right a:hover {
-      color: #d4ac0d;
+      color: #007BFF;
     }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #fff;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-      min-width: 160px;
-      z-index: 1000;
-      border-radius: 4px;
-    }
-    .dropdown-content a {
-      padding: 10px 15px;
-      display: block;
-      color: #1a252f;
-      text-decoration: none;
-      transition: background-color 0.3s;
-    }
-    .dropdown-content a:hover {
-      background-color: #f8f9fa;
-    }
-    .nav-item:hover .dropdown-content {
-      display: block;
-    }
-    .highlight-btn {
+
+    .login-btn {
       background-color: #f1c40f;
-      color: #2c3e50;
+      border: none;
       padding: 8px 16px;
-      border-radius: 6px;
+      border-radius: 5px;
+      color: #333;
       font-weight: bold;
-      transition: background-color 0.3s;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    .highlight-btn:hover {
+
+    .login-btn:hover {
       background-color: #d4ac0d;
     }
 
+    /* بقية الأنماط */
     .content {
       padding: 30px;
+      flex-grow: 1;
+    }
+
+    .hero {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      color: #f1c40f;
+    }
+    .hero h2 {
+      margin-top: 10px;
+      font-weight: normal;
+      font-size: 1.4rem;
+    }
+    .hero p {
+      margin-top: 15px;
+      font-size: 1rem;
+      color: #ddd;
     }
   </style>
 </head>
@@ -126,37 +141,25 @@
   </div>
 
   <div class="main">
-    <div class="navbar">
+    <!-- شريط التنقل العلوي المحدث -->
+    <nav class="navbar">
       <div class="nav-left">
         <a href="index_admin.html">Home</a>
-        <div class="nav-item">
-          <a href="#">Materials ▼</a>
-          <div class="dropdown-content">
-            <a href="#">Books</a>
-            <a href="#">Tests</a>
-            <a href="#">Videos</a>
-            <a href="#">Pictures</a>
-            <a href="#">Other Resources</a>
-          </div>
-        </div>
-        <div class="nav-item">
-          <a href="#">Computerized Tests ▼</a>
-          <div class="dropdown-content">
-            <a href="act_i_test_list.html">ACT I</a>
-            <a href="act_ii_test_list.html">ACT II</a>
-            <a href="est_i_test_list.html">EST I</a>
-            <a href="est_ii_test_list.html">EST II</a>
-            <a href="dsat_test_list.html">Digital SAT</a>
-            <a href="univ_courses_test_list.html">University Courses</a>
-          </div>
-        </div>
-        <a href="book_shop.html">Book Shop</a>
+        <a href="#">Materials</a>
+        <a href="#">Computerized Tests</a>
         <a href="contact.html">Contact Us</a>
         <a href="calculator.html">Score Calculator</a>
       </div>
       <div class="nav-right">
-        <a href="login.html" class="highlight-btn">Login</a>
+        <a href="login.html"><button class="login-btn">Login</button></a>
       </div>
+    </nav>
+
+    <div class="hero">
+      <h1>AHMED OMAR</h1>
+      <h2>MATH PROFESSOR</h2>
+      <p>More than 40 years of experience teaching university-level students</p>
+      <p>More than 15 years of experience teaching American Diploma students</p>
     </div>
 
     <div class="content">
