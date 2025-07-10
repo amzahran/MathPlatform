@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>
+    Question Editor
+  </title>
+  <link href="css/question.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container">
+    <h2 id="questionTitle">
+      Question 1 of 30
+    </h2>
+    <label for="questionText">
+      Question Text
+    </label>
+    <textarea id="questionText" oninput="renderPreview()"></textarea>
+    <label for="questionImage">
+      Question Image (optional)
+    </label>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+      <input id="questionImageInput" onchange="previewImage(this, 'questionImageDisplay')" type="file" />
+      <img id="questionImageDisplay" style="max-width: 200px; display: none;" />
+    </div>
+    <img class="image-preview" id="questionImagePreview" />
+    <label for="questionType">
+      Question Type
+    </label>
+    <select id="questionType" onchange="toggleAnswerBlock(); renderPreview();">
+      <option value="MCQ">
+        Multiple Choice (MCQ)
+      </option>
+      <option value="Grid-In">
+        Grid-In
+      </option>
+    </select>
+    <div id="mcqOptions">
+      <h4>
+        Options
+      </h4>
+      <div class="option-block">
+        <input id="radioOption0" name="correctAnswer" onclick="setCorrectAnswer(0)" type="radio" value="option0" />
+        <input class="option-text" id="option0" oninput="renderPreview()" placeholder="Option A" type="text" />
+        <input accept="image/*" id="optionImage0" onchange="showPreviewImage(this, 'optionPreview0')" type="file" />
+        <img class="image-preview" id="optionPreview0" />
+      </div>
+      <div class="option-block">
+        <input id="radioOption1" name="correctAnswer" onclick="setCorrectAnswer(1)" type="radio" value="option1" />
+        <input class="option-text" id="option1" oninput="renderPreview()" placeholder="Option B" type="text" />
+        <input accept="image/*" id="optionImage1" onchange="showPreviewImage(this, 'optionPreview1')" type="file" />
+        <img class="image-preview" id="optionPreview1" />
+      </div>
+      <div class="option-block">
+        <input id="radioOption2" name="correctAnswer" onclick="setCorrectAnswer(2)" type="radio" value="option2" />
+        <input class="option-text" id="option2" oninput="renderPreview()" placeholder="Option C" type="text" />
+        <input accept="image/*" id="optionImage2" onchange="showPreviewImage(this, 'optionPreview2')" type="file" />
+        <img class="image-preview" id="optionPreview2" />
+      </div>
+      <div class="option-block">
+        <input id="radioOption3" name="correctAnswer" onclick="setCorrectAnswer(3)" type="radio" value="option3" />
+        <input class="option-text" id="option3" oninput="renderPreview()" placeholder="Option D" type="text" />
+        <input accept="image/*" id="optionImage3" onchange="showPreviewImage(this, 'optionPreview3')" type="file" />
+        <img class="image-preview" id="optionPreview3" />
+      </div>
+      <button id="addOptionBtn" onclick="addOption()" type="button">
+        Add Option
+      </button>
+    </div>
+    <div id="gridInAnswerBlock" style="display:none;">
+      <label for="gridInAnswer">
+        Correct Answer (Grid-In)
+      </label>
+      <input id="gridInAnswer" oninput="renderPreview()" type="text" />
+    </div>
+    <label for="explanation">
+      Explanation
+    </label>
+    <textarea id="explanation" oninput="renderPreview()"></textarea>
+    <label for="explanationImage">
+      Explanation Image (optional)
+    </label>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+      <input id="explanationImageInput" onchange="previewImage(this, 'explanationImageDisplay')" type="file" />
+      <img id="explanationImageDisplay" style="max-width: 200px; display: none;" />
+    </div>
+    <img class="image-preview" id="explanationImagePreview" />
+    <label for="score">
+      Score
+    </label>
+    <input id="score" min="0" oninput="renderPreview()" type="number" value="15" />
+    <div class="preview-box" id="preview">
+      <div class="preview-section">
+        <h3>
+          Question Preview
+        </h3>
+        <div class="question-content">
+          <div class="preview-text" id="previewQuestionText">
+            <em>
+              No question text entered
+            </em>
+          </div>
+          <div id="previewQuestionImage">
+          </div>
+        </div>
+      </div>
+      <div class="preview-section" id="previewOptions" style="display:none;">
+        <h4>
+          Options:
+        </h4>
+        <div class="options-list" id="previewOptionsList">
+        </div>
+        <div class="correct-answer" id="previewCorrectAnswer">
+        </div>
+      </div>
+      <div class="preview-section" id="previewGridInAnswer" style="display:none;">
+        <h4>
+          Correct Answer:
+        </h4>
+        <div id="previewGridInAnswerText">
+          <em>
+            No answer provided
+          </em>
+        </div>
+      </div>
+      <div class="preview-section">
+        <h4>
+          Explanation:
+        </h4>
+        <div class="preview-text" id="previewExplanation">
+          <em>
+            No explanation provided
+          </em>
+        </div>
+        <div id="previewExplanationImage">
+        </div>
+      </div>
+      <div class="preview-section score-section">
+        <strong>
+          Score:
+        </strong>
+        <span id="previewScore">
+          15
+        </span>
+      </div>
+    </div>
+    <div class="button-group">
+      <button id="previousBtn" onclick="goToPrevious()">
+        ⬅ Previous
+      </button>
+      <button id="nextBtn" onclick="goToNext()">
+        Next ➡
+      </button>
+      <button id="saveQuestionBtn">Save Question</button>
+      </button>
+    </div>
+  </div>
+  <script>
+    let currentQuestion = 1;
+    let optionCount = 4;
+    let totalQuestions = 30;
+    let correctAnswerIndex = -1;
+
+    // Load section data from localStorage
+    const sectionData = JSON.parse(localStorage.getItem('currentSection'));
+    if (sectionData) {
+      totalQuestions = parseInt(sectionData.questionCount);
+    }
+
+    function updateQuestionText() {
+      const questionTitle = document.getElementById("questionTitle");
+      questionTitle.innerHTML = `Question ${currentQuestion} of ${totalQuestions}`;
+      document.title = `Question ${currentQuestion} of ${totalQuestions}`;
+    }
+
+    function goToNext() {
+      if (currentQuestion < totalQuestions) {
+        currentQuestion++;
+        updateQuestionText();
+        renderPreview();
+        enableDisableButtons();
+      }
+    }
+
+    function goToPrevious() {
+      if (currentQuestion > 1) {
+        currentQuestion--;
+        updateQuestionText();
+        renderPreview();
+        enableDisableButtons();
+      }
+    }
+
+    function enableDisableButtons() {
+      const previousBtn = document.getElementById("previousBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const saveTestBtn = document.getElementById("saveTestBtn");
+      const nextSectionBtn = document.getElementById("nextSectionBtn");
+
+      previousBtn.disabled = currentQuestion === 1;
+      nextBtn.disabled = currentQuestion === totalQuestions;
+      saveTestBtn.style.display = currentQuestion === 1 ? 'none' : 'inline-block';
+      nextSectionBtn.style.display = currentQuestion === totalQuestions ? 'inline-block' : 'none';
+    }
+
+    function renderPreview() {
+      const questionText = document.getElementById('questionText').value;
+      const explanation = document.getElementById('explanation').value;
+      const score = document.getElementById('score').value || 15;
+      const questionType = document.getElementById('questionType').value;
+
+      // Display question text
+      const previewQuestionText = document.getElementById('previewQuestionText');
+      previewQuestionText.innerHTML = questionText || '<em>No question text entered</em>';
+
+      // Display question image
+      const questionImagePreview = document.getElementById('questionImagePreview');
+      const previewQuestionImage = document.getElementById('previewQuestionImage');
+      previewQuestionImage.innerHTML = '';
+      if (questionImagePreview.style.display !== 'none') {
+        const img = document.createElement('img');
+        img.src = questionImagePreview.src;
+        img.className = 'preview-image';
+        previewQuestionImage.appendChild(img);
+      }
+
+      // Display explanation
+      const previewExplanation = document.getElementById('previewExplanation');
+      previewExplanation.innerHTML = explanation || '<em>No explanation provided</em>';
+
+      // Display explanation image
+      const explanationImagePreview = document.getElementById('explanationImagePreview');
+      const previewExplanationImage = document.getElementById('previewExplanationImage');
+      previewExplanationImage.innerHTML = '';
+      if (explanationImagePreview.style.display !== 'none') {
+        const img = document.createElement('img');
+        img.src = explanationImagePreview.src;
+        img.className = 'preview-image';
+        previewExplanationImage.appendChild(img);
+      }
+
+      // Display MCQ or Grid-In answers
+      const previewOptions = document.getElementById('previewOptions');
+      const previewOptionsList = document.getElementById('previewOptionsList');
+      const previewGridInAnswer = document.getElementById('previewGridInAnswer');
+
+      if (questionType === "MCQ") {
+        previewOptions.style.display = "block";
+        previewGridInAnswer.style.display = "none";
+
+        previewOptionsList.innerHTML = '';
+        for (let i = 0; i < optionCount; i++) {
+          const optionText = document.getElementById(`option${i}`).value;
+          const optionPreview = document.getElementById(`optionPreview${i}`);
+
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'option-item';
+          optionDiv.innerHTML = `<strong>${String.fromCharCode(65 + i)}:</strong> ${optionText || '<em>Empty option</em>'}`;
+
+          if (optionPreview.style.display !== 'none') {
+            const img = document.createElement('img');
+            img.src = optionPreview.src;
+            img.className = 'option-preview-image';
+            optionDiv.appendChild(img);
+          }
+
+          previewOptionsList.appendChild(optionDiv);
+        }
+
+        // Display correct answer
+        const correctAnswerDiv = document.getElementById('previewCorrectAnswer');
+        correctAnswerDiv.innerHTML = '';
+        if (correctAnswerIndex !== -1) {
+          correctAnswerDiv.innerHTML = `<div class="correct-answer"><strong>Correct Answer:</strong> Option ${String.fromCharCode(65 + correctAnswerIndex)}</div>`;
+        }
+      } else {
+        previewOptions.style.display = "none";
+        previewGridInAnswer.style.display = "block";
+        const gridInAnswer = document.getElementById('gridInAnswer').value;
+        document.getElementById('previewGridInAnswerText').textContent = gridInAnswer || 'No answer provided';
+      }
+
+      // Display score
+      document.getElementById('previewScore').textContent = score;
+    }
+
+    function setCorrectAnswer(index) {
+      correctAnswerIndex = index;
+      renderPreview();
+    }
+
+    function toggleAnswerBlock() {
+      const questionType = document.getElementById('questionType').value;
+      document.getElementById('mcqOptions').style.display = questionType === "MCQ" ? "block" : "none";
+      document.getElementById('gridInAnswerBlock').style.display = questionType === "Grid-In" ? "block" : "none";
+      renderPreview();
+    }
+
+    function showPreviewImage(input, previewId) {
+      const preview = document.getElementById(previewId);
+      const file = input.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          renderPreview();
+        }
+
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+        renderPreview();
+      }
+    }
+
+    function addOption() {
+      alert("Functionality to add more options will be implemented later");
+    }
+
+    function saveTest() {
+      alert("Save test functionality will be implemented later");
+    }
+
+    function goToNextSection() {
+      window.location.href = "section.html?section=${nextSectionNumber}";
+    }
+
+    window.onload = function () {
+      updateQuestionText();
+      enableDisableButtons();
+      toggleAnswerBlock();
+      renderPreview();
+    };
+
+    function previewImage(input, imgId) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById(imgId);
+        if (img) {
+          img.src = e.target.result;
+          img.style.display = 'block';
+        }
+
+        if (imgId === 'questionImageDisplay') {
+          const previewImg = document.getElementById('previewQuestionImage');
+          if (previewImg) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+          }
+        }
+
+        if (imgId === 'explanationImageDisplay') {
+          const previewImg = document.getElementById('previewExplanationImage');
+          if (previewImg) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+
+
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const saveBtn = document.getElementById("saveQuestionBtn");
+
+      if (saveBtn) {
+        saveBtn.addEventListener("click", saveQuestion);
+      } else {
+        console.error("❌ زر الحفظ غير موجود أو غير معرف بـ id=saveButton");
+      }
+    });
+  </script>
+  <script src="js/question.js" defer></script>
+</body>
+
+</html>
